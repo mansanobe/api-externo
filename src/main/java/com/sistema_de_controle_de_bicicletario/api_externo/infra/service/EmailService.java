@@ -1,5 +1,7 @@
 package com.sistema_de_controle_de_bicicletario.api_externo.infra.service;
 
-public class EmailService {
+import com.sistema_de_controle_de_bicicletario.api_externo.gateway.MessageSenderInterface;
+
+public class EmailService implements MessageSenderInterface {
 
 }
