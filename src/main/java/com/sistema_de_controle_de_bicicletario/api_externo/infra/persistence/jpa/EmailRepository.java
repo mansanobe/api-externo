@@ -1,11 +1,6 @@
 package com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-
-@Repository
-@NoArgsConstructor
-public class EmailRepository {
+public interface EmailRepository extends JpaRepository<EmailEntity, String> {
 }

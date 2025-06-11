@@ -1,38 +1,50 @@
 package com.sistema_de_controle_de_bicicletario.api_externo.infra;
 
+import com.sistema_de_controle_de_bicicletario.api_externo.application.EmailUseCase;
 import com.sistema_de_controle_de_bicicletario.api_externo.domain.Email;
 import com.sistema_de_controle_de_bicicletario.api_externo.infra.dto.EmailRequest;
+import com.sistema_de_controle_de_bicicletario.api_externo.infra.dto.EmailResponse;
 import com.sistema_de_controle_de_bicicletario.api_externo.infra.service.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.web.servlet.function.ServerResponse.ok;
 
 
-@Controller
+@RestController
 @RequestMapping
 public class EmailController {
-    private final EmailService emailService = new EmailService();
+    private final EmailUseCase emailUseCase;
+
+    @Autowired
+    public EmailController(EmailService emailService) {
+        this.emailUseCase = new EmailUseCase(emailService);
+    }
+
     @PostMapping("/enviarEmail")
-    public ResponseEntity<Email> enviarEmail(@RequestBody @Valid EmailRequest emailRequest){
+    public ResponseEntity<Object> enviarEmail(@RequestBody @Valid EmailRequest emailRequest){
         try {
-            emailService.enviarEmail(new Email(
+            Email email = emailUseCase.enviarEmail(new Email(
                     emailRequest.getEmail(),
                     emailRequest.getAssunto(),
                     emailRequest.getMensagem()
+
             ));
+            EmailResponse emailResponse = new EmailResponse(
+                    email.getId(),
+                    email.getEmail(),
+                    email.getAssunto(),
+                    email.getMensagem()
+            );
+            return ResponseEntity.ok().body(emailResponse);
         }catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }catch (Throwable t) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
 
-        return null;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
