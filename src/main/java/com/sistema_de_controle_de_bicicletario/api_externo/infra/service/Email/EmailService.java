@@ -1,20 +1,17 @@
-package com.sistema_de_controle_de_bicicletario.api_externo.infra.service;
+package com.sistema_de_controle_de_bicicletario.api_externo.infra.service.Email;
 
 import com.sistema_de_controle_de_bicicletario.api_externo.domain.Email;
 import com.sistema_de_controle_de_bicicletario.api_externo.gateway.EmailServiceInterface;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa.EmailJPAEntity;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa.EmailJPARepository;
+import com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa.Email.EmailJPAEntity;
+import com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa.Email.EmailJPARepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import java.io.UnsupportedEncodingException;
 
@@ -23,14 +20,12 @@ public class EmailService implements EmailServiceInterface {
     private final EmailJPARepository emailJPARepository;
     private final JavaMailSender javaMailSender;
     private final Environment ambiente;
-    private final TemplateEngine htmlTemplateEngine;
 
     @Autowired
-    public EmailService(EmailJPARepository emailJPARepository, JavaMailSender javaMailSender, Environment ambiente, TemplateEngine htmlTemplateEngine) {
+    public EmailService(EmailJPARepository emailJPARepository, JavaMailSender javaMailSender, Environment ambiente) {
         this.emailJPARepository = emailJPARepository;
         this.javaMailSender = javaMailSender;
         this.ambiente = ambiente;
-        this.htmlTemplateEngine = htmlTemplateEngine;
     }
 
     @Override
@@ -50,12 +45,11 @@ public class EmailService implements EmailServiceInterface {
         String mensagemEmail = emailBase.getMensagem();
         final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         final MimeMessageHelper email = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-        final Context contexto = new Context(LocaleContextHolder.getLocale());
 
         email.setTo(emailBase.getEmail());
         email.setSubject(assuntoEmail);
         email.setFrom(new InternetAddress(remetenteEmail, nomeEmail));
-        email.setText(mensagemEmail, false);;
+        email.setText(mensagemEmail, false);
 
         return mimeMessage;
     }

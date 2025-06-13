@@ -1,4 +1,4 @@
-package com.sistema_de_controle_de_bicicletario.api_externo.infra.dto;
+package com.sistema_de_controle_de_bicicletario.api_externo.infra.dto.Email;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Pattern;

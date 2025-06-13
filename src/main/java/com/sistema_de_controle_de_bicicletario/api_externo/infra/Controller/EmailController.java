@@ -1,18 +1,15 @@
-package com.sistema_de_controle_de_bicicletario.api_externo.infra;
+package com.sistema_de_controle_de_bicicletario.api_externo.infra.Controller;
 
 import com.sistema_de_controle_de_bicicletario.api_externo.application.EmailUseCase;
 import com.sistema_de_controle_de_bicicletario.api_externo.domain.Email;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.dto.EmailRequest;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.dto.EmailResponse;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.service.EmailService;
+import com.sistema_de_controle_de_bicicletario.api_externo.infra.dto.Email.EmailRequest;
+import com.sistema_de_controle_de_bicicletario.api_externo.infra.dto.Email.EmailResponse;
+import com.sistema_de_controle_de_bicicletario.api_externo.infra.service.Email.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-
-import static org.springframework.web.servlet.function.ServerResponse.ok;
 
 
 @RestController

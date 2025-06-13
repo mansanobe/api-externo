@@ -1,12 +1,13 @@
-package com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa;
+package com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa.Email;
 
-import com.sistema_de_controle_de_bicicletario.api_externo.domain.Email;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "email")
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class EmailJPAEntity {
@@ -17,7 +18,7 @@ public class EmailJPAEntity {
     private String assunto;
     private String mensagem;
 
-    public EmailJPAEntity(String email, String mensagem, String assunto) {
+    public EmailJPAEntity(String email, String assunto, String mensagem) {
         this.email = email;
         this.mensagem = mensagem;
         this.assunto = assunto;
