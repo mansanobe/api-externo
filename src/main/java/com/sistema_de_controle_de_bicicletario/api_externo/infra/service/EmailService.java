@@ -1,9 +1,9 @@
 package com.sistema_de_controle_de_bicicletario.api_externo.infra.service;
 
 import com.sistema_de_controle_de_bicicletario.api_externo.domain.Email;
-import com.sistema_de_controle_de_bicicletario.api_externo.gateway.MessageSenderInterface;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa.EmailEntity;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa.EmailRepository;
+import com.sistema_de_controle_de_bicicletario.api_externo.gateway.EmailServiceInterface;
+import com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa.EmailJPAEntity;
+import com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa.EmailJPARepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -19,33 +19,31 @@ import org.thymeleaf.context.Context;
 import java.io.UnsupportedEncodingException;
 
 @Service
-public class EmailService implements MessageSenderInterface {
-    private final EmailRepository emailRepository;
+public class EmailService implements EmailServiceInterface {
+    private final EmailJPARepository emailJPARepository;
     private final JavaMailSender javaMailSender;
     private final Environment ambiente;
     private final TemplateEngine htmlTemplateEngine;
 
     @Autowired
-    public EmailService(EmailRepository emailRepository, JavaMailSender javaMailSender, Environment ambiente, TemplateEngine htmlTemplateEngine) {
-        this.emailRepository = emailRepository;
+    public EmailService(EmailJPARepository emailJPARepository, JavaMailSender javaMailSender, Environment ambiente, TemplateEngine htmlTemplateEngine) {
+        this.emailJPARepository = emailJPARepository;
         this.javaMailSender = javaMailSender;
         this.ambiente = ambiente;
         this.htmlTemplateEngine = htmlTemplateEngine;
     }
 
     @Override
-    public Email enviarEmail(Email email) {
+    public Boolean enviarEmail(MimeMessage email) {
         try{
-            MimeMessage mensagemEmail = constroiEmail(email);
-            javaMailSender.send(mensagemEmail);
+            javaMailSender.send(email);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        EmailEntity emailEntity = emailRepository.save(new EmailEntity(email.getEmail(), email.getMensagem(), email.getAssunto()));
-        return new Email(emailEntity.getId(), emailEntity.getEmail(), emailEntity.getAssunto(), emailEntity.getMensagem());
+        return true;
     }
 
-    private MimeMessage constroiEmail(Email emailBase) throws MessagingException, UnsupportedEncodingException {
+    public MimeMessage constroiEmail(Email emailBase) throws MessagingException, UnsupportedEncodingException {
         String remetenteEmail = ambiente.getProperty("spring.mail.properties.mail.smtp.from");
         String nomeEmail = ambiente.getProperty("mail.from.name", "Sistema de Controle de Bicicletário");
         String assuntoEmail = emailBase.getAssunto();
@@ -57,14 +55,21 @@ public class EmailService implements MessageSenderInterface {
         email.setTo(emailBase.getEmail());
         email.setSubject(assuntoEmail);
         email.setFrom(new InternetAddress(remetenteEmail, nomeEmail));
-        contexto.setVariable("email", emailBase.getEmail());
-        contexto.setVariable("mensagem", mensagemEmail);
-
-        String NOME_TEMPLATE = "emailTemplate";
-        final String conteudoHTML = this.htmlTemplateEngine.process(NOME_TEMPLATE, contexto);
-
-        email.setText(conteudoHTML, true);
+        email.setText(mensagemEmail, false);;
 
         return mimeMessage;
+    }
+
+    public Email salvarEmail(Email emailBase){
+        EmailJPAEntity emailJPAEntity = emailJPARepository.save(new EmailJPAEntity(
+                emailBase.getEmail(),
+                emailBase.getAssunto(),
+                emailBase.getMensagem()));
+        return new Email(
+                emailJPAEntity.getId(),
+                emailJPAEntity.getEmail(),
+                emailJPAEntity.getAssunto(),
+                emailJPAEntity.getMensagem()
+        );
     }
 }

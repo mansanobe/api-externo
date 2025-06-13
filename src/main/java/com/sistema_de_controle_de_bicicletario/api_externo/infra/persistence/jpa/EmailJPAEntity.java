@@ -1,17 +1,15 @@
 package com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa;
 
+import com.sistema_de_controle_de_bicicletario.api_externo.domain.Email;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 @Table(name = "email")
 @NoArgsConstructor
 @Getter
-public class EmailEntity {
+public class EmailJPAEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
@@ -19,9 +17,10 @@ public class EmailEntity {
     private String assunto;
     private String mensagem;
 
-    public EmailEntity(String email, String mensagem, String assunto) {
+    public EmailJPAEntity(String email, String mensagem, String assunto) {
         this.email = email;
         this.mensagem = mensagem;
         this.assunto = assunto;
     }
+
 }

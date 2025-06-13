@@ -2,5 +2,5 @@ package com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jp
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface EmailRepository extends JpaRepository<EmailEntity, String> {
+public interface EmailJPARepository extends JpaRepository<EmailJPAEntity, String> {
 }
