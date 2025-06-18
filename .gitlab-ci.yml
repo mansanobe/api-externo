@@ -16,6 +16,14 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
+services:
+  - name: postgres:latest
+    alias: postgres_db
+    variables:
+        POSTGRES_DB: teste
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+
 stages:          # List of stages for jobs, and their order of execution
   - build
   - analyze
@@ -33,6 +41,10 @@ unit-test-job:   # This job runs in the test stage.
   image: maven:3.9.6-eclipse-temurin-17
   script:
     - mvn test
+  variables:
+    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/teste
+    SPRING_DATASOURCE_USERNAME: postgres
+    SPRING_DATASOURCE_PASSWORD: postgres
 
 
 
