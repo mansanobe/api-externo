@@ -77,9 +77,6 @@ sonarcloud-check:
     - master
     - develop
   allow_failure: true
-  needs:
-    - unit-test-job
-  # Removida a segunda definição de 'cache' aqui.
 
 # Job para a fase de deploy.
 deploy-job:
@@ -88,5 +85,3 @@ deploy-job:
   script:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
-  needs:
-    - sonarcloud-check
