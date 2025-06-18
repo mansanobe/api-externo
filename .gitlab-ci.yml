@@ -1,87 +1,73 @@
-# Este arquivo é a configuração de CI/CD para seu projeto no GitLab.
-# Configurado para usar SonarCloud.
+# This file is a template, and might need editing before it works on your project.
+# This is a sample GitLab CI/CD configuration file that should run without any modifications.
+# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
+# it uses echo commands to simulate the pipeline execution.
+#
+# A pipeline is composed of independent jobs that run scripts, grouped into stages.
+# Stages run in sequential order, but jobs within stages run in parallel.
+#
+# For more information, see: https://docs.gitlab.com/ee/ci/yaml/#stages
+#
+# You can copy and paste this template into a new `.gitlab-ci.yml` file.
+# You should not add this template to an existing `.gitlab-ci.yml` file by using the `include:` keyword.
+#
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/development/cicd/templates/
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
-# Definição dos serviços que serão executados em containers separados.
 services:
-  - name: postgres:15
+  - name: postgres:latest
     alias: postgres_db
     variables:
       POSTGRES_DB: teste
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
 
-# Definição dos estágios do pipeline, na ordem de execução.
-stages:
+stages:          # List of stages for jobs, and their order of execution
   - build
-  - test
   - analyze
+  - test
   - deploy
 
-# Variáveis globais para o pipeline.
-variables:
-  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/teste
-  SPRING_DATASOURCE_USERNAME: postgres
-  SPRING_DATASOURCE_PASSWORD: postgres
-
-  SONAR_HOST_URL: https://sonarcloud.io
-  SONAR_ORGANIZATION: "unirio4" 
-  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
-  GIT_DEPTH: "0"
-
-# Job para a fase de build.
-build-job:
+build-job:       # This job runs in the build stage, which runs first.
   stage: build
-  image: maven:3.9.6-eclipse-temurin-17
   script:
     - echo "Compiling the code..."
-    - mvn compile
     - echo "Compile complete."
-  cache:
-    key: "${CI_COMMIT_REF_SLUG}"
-    paths:
-      - ~/.m2/repository
-    policy: push # Adicionado para garantir que o cache é salvo após o build
 
-# Job para a fase de testes unitários.
-unit-test-job:
-  stage: test
+unit-test-job:   # This job runs in the test stage.
+  stage: test    # It only starts when the job in the build stage completes successfully.
   image: maven:3.9.6-eclipse-temurin-17
   script:
-    - echo "Running unit tests..."
     - mvn test
-    - echo "Unit tests complete."
-  cache:
-    key: "${CI_COMMIT_REF_SLUG}"
-    paths:
-      - ~/.m2/repository
-    policy: pull
+  variables:
+    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/teste
+    SPRING_DATASOURCE_USERNAME: postgres
+    SPRING_DATASOURCE_PASSWORD: postgres
 
-# Job para a análise de qualidade de código com SonarCloud.
+
+
+deploy-job:      # This job runs in the deploy stage.
+  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+  environment: production
+  script:
+    - echo "Deploying application..."
+    - echo "Application successfully deployed."
+variables:
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+  GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
 sonarcloud-check:
   stage: analyze
   image: maven:3-openjdk-17
   cache:
-    # Combine todos os caminhos de cache aqui.
-    # O cache para ~/.m2/repository geralmente é suficiente com a mesma key dos jobs anteriores.
-    key: "${CI_COMMIT_REF_SLUG}" # Reusa o cache de dependências Maven de outros jobs para este slug
+    key: "${CI_JOB_NAME}"
     paths:
-      - ~/.m2/repository # Cache das dependências Maven
-      - .sonar/cache     # Cache específico do SonarScanner para análises incrementais
-    policy: pull # Baixa o cache no início do job
+      - .sonar/cache
   script:
-    - echo "Running SonarCloud analysis..."
-    - mvn clean verify sonar:sonar -Dsonar.projectKey=unirio4_api-externo
+    - mvn verify sonar:sonar -Dsonar.projectKey=unirio4_api-externo
   only:
     - merge_requests
     - main
     - master
     - develop
-  allow_failure: true
-
-# Job para a fase de deploy.
-deploy-job:
-  stage: deploy
-  environment: production
-  script:
-    - echo "Deploying application..."
-    - echo "Application successfully deployed."
