@@ -23,21 +23,11 @@ public class EmailController {
     }
 
     @PostMapping("/enviarEmail")
-    public ResponseEntity<Object> enviarEmail(@RequestBody @Valid EmailRequest emailRequest){
+    public ResponseEntity<String> enviarEmail(@RequestBody @Valid EmailRequest emailRequest){
         try {
-            Email email = emailUseCase.enviarEmail(new Email(
-                    emailRequest.getEmail(),
-                    emailRequest.getAssunto(),
-                    emailRequest.getMensagem()
-
-            ));
-            EmailResponse emailResponse = new EmailResponse(
-                    email.getId(),
-                    email.getEmail(),
-                    email.getAssunto(),
-                    email.getMensagem()
-            );
-            return ResponseEntity.ok().body(emailResponse);
+            Email emailBase = new Email(emailRequest.getEmail(), emailRequest.getAssunto(), emailRequest.getMensagem());
+            EmailResponse emailResponse = emailUseCase.enviarEmail(emailBase) ?  new EmailResponse(emailBase.getEmail(), emailBase.getAssunto(), emailBase.getMensagem()) : null;
+            return ResponseEntity.ok().body(emailResponse.toString());
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

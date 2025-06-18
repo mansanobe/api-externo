@@ -10,6 +10,4 @@ public interface EmailServiceInterface {
     Boolean enviarEmail(MimeMessage email);
 
     MimeMessage constroiEmail(Email email) throws MessagingException, UnsupportedEncodingException;
-
-    Email salvarEmail(Email email);
 }

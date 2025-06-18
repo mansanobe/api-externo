@@ -8,14 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class Email {
-    private Integer id;
     private String email;
     private String assunto;
     private String mensagem;
-
-    public Email(String email, String Assunto, String mensagem) {
-        this.email = email;
-        this.assunto = Assunto;
-        this.mensagem = mensagem;
-    }
 }

@@ -11,7 +11,7 @@ import java.io.UnsupportedEncodingException;
 public class EmailUseCase {
     EmailServiceInterface servico;
 
-    public Email enviarEmail(Email emailBase) throws MessagingException, UnsupportedEncodingException {
-        return servico.enviarEmail(servico.constroiEmail(emailBase)) ? servico.salvarEmail(emailBase)  : null;
+    public Boolean enviarEmail(Email emailBase) throws MessagingException, UnsupportedEncodingException {
+        return servico.enviarEmail(servico.constroiEmail(emailBase));
     }
 }

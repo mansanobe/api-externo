@@ -2,8 +2,6 @@ package com.sistema_de_controle_de_bicicletario.api_externo.infra.service.Email;
 
 import com.sistema_de_controle_de_bicicletario.api_externo.domain.Email;
 import com.sistema_de_controle_de_bicicletario.api_externo.gateway.EmailServiceInterface;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa.Email.EmailJPAEntity;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.persistence.jpa.Email.EmailJPARepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -17,16 +15,15 @@ import java.io.UnsupportedEncodingException;
 
 @Service
 public class EmailService implements EmailServiceInterface {
-    private final EmailJPARepository emailJPARepository;
     private final JavaMailSender javaMailSender;
     private final Environment ambiente;
 
     @Autowired
-    public EmailService(EmailJPARepository emailJPARepository, JavaMailSender javaMailSender, Environment ambiente) {
-        this.emailJPARepository = emailJPARepository;
+    public EmailService(JavaMailSender javaMailSender, Environment ambiente) {
         this.javaMailSender = javaMailSender;
         this.ambiente = ambiente;
     }
+
 
     @Override
     public Boolean enviarEmail(MimeMessage email) {
@@ -52,18 +49,5 @@ public class EmailService implements EmailServiceInterface {
         email.setText(mensagemEmail, false);
 
         return mimeMessage;
-    }
-
-    public Email salvarEmail(Email emailBase){
-        EmailJPAEntity emailJPAEntity = emailJPARepository.save(new EmailJPAEntity(
-                emailBase.getEmail(),
-                emailBase.getAssunto(),
-                emailBase.getMensagem()));
-        return new Email(
-                emailJPAEntity.getId(),
-                emailJPAEntity.getEmail(),
-                emailJPAEntity.getAssunto(),
-                emailJPAEntity.getMensagem()
-        );
     }
 }

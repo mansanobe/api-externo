@@ -6,8 +6,16 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class EmailResponse {
-    private Integer id;
     private String email;
     private String assunto;
     private String mensagem;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\n   \"email\": \"" + email + '\"' +
+                ", \n   \"assunto\": \"" + assunto + '\"' +
+                ", \n   \"mensagem\": \"" + mensagem + '\"' + '\n' +
+                '}';
+    }
 }
