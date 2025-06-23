@@ -20,9 +20,9 @@ services:
   - name: postgres:latest
     alias: postgres_db
     variables:
-        POSTGRES_DB: teste
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: teste
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
 
 stages:          # List of stages for jobs, and their order of execution
   - build
@@ -65,7 +65,7 @@ sonarcloud-check:
     paths:
       - .sonar/cache
   script:
-    - mvn verify sonar:sonar -Dsonar.projectKey=unirio4_api-externo
+     - mvn verify sonar:sonar -Dsonar.projectKey=unirio4_api-externo -Dsonar.host.url=https:$SONAR_HOST_URL
   only:
     - merge_requests
     - main
