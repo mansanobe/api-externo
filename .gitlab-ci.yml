@@ -65,7 +65,8 @@ sonarcloud-check:
     paths:
       - .sonar/cache
   script:
-     - mvn verify sonar:sonar -Dsonar.projectKey=unirio4_api-externo -Dsonar.host.url=https:$SONAR_HOST_URL
+     - mvn verify sonar:sonar -Dsonar.projectKey=api-externo_api-externo -Dsonar.organization=api-externo -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=484df7216637eb3c6bd45af0626e6c3fceedac55
+
   only:
     - merge_requests
     - main
