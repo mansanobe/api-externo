@@ -1,8 +1,7 @@
 package com.sistema_de_controle_de_bicicletario.api_externo;
 
-
-import com.sistema_de_controle_de_bicicletario.api_externo.domain.Email;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.service.Email.EmailService;
+import com.sistema_de_controle_de_bicicletario.api_externo.dto.Email.EmailRequest;
+import com.sistema_de_controle_de_bicicletario.api_externo.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +31,7 @@ public class EmailServiceTest {
     @InjectMocks
     private EmailService emailService;
 
-    Email email = new Email("bernmedman@gmail.com", "Assunto do Email", "Mensagem do Email");
+    EmailRequest email = new EmailRequest("bernmedman@gmail.com", "Assunto do Email", "Mensagem do Email");
 
     MimeMessage mimeMessage;
 

@@ -1,7 +1,7 @@
-package com.sistema_de_controle_de_bicicletario.api_externo.infra.service.Email;
+package com.sistema_de_controle_de_bicicletario.api_externo.service;
 
-import com.sistema_de_controle_de_bicicletario.api_externo.domain.Email;
-import com.sistema_de_controle_de_bicicletario.api_externo.gateway.EmailServiceInterface;
+import com.sistema_de_controle_de_bicicletario.api_externo.dto.Email.EmailRequest;
+import com.sistema_de_controle_de_bicicletario.api_externo.interfaces.EmailServiceInterface;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -35,7 +35,7 @@ public class EmailService implements EmailServiceInterface {
         return true;
     }
 
-    public MimeMessage constroiEmail(Email emailBase) throws MessagingException, UnsupportedEncodingException {
+    public MimeMessage constroiEmail(EmailRequest emailBase) throws MessagingException, UnsupportedEncodingException {
         String remetenteEmail = ambiente.getProperty("spring.mail.properties.mail.smtp.from");
         String nomeEmail = ambiente.getProperty("mail.from.name", "Sistema de Controle de Bicicletário");
         String assuntoEmail = emailBase.getAssunto();

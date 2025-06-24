@@ -1,13 +1,14 @@
-package com.sistema_de_controle_de_bicicletario.api_externo.infra.Controller;
+package com.sistema_de_controle_de_bicicletario.api_externo.controller;
 
-import com.sistema_de_controle_de_bicicletario.api_externo.application.EmailUseCase;
-import com.sistema_de_controle_de_bicicletario.api_externo.domain.Email;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.dto.Email.EmailRequest;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.dto.Email.EmailResponse;
-import com.sistema_de_controle_de_bicicletario.api_externo.infra.service.Email.EmailService;
+import com.sistema_de_controle_de_bicicletario.api_externo.dto.Email.EmailRequest;
+import com.sistema_de_controle_de_bicicletario.api_externo.dto.Email.EmailResponse;
+import com.sistema_de_controle_de_bicicletario.api_externo.interfaces.EmailServiceInterface;
+import com.sistema_de_controle_de_bicicletario.api_externo.service.EmailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,18 +16,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping
 public class EmailController {
-    private final EmailUseCase emailUseCase;
+    private final EmailServiceInterface emailService;
 
     @Autowired
-    public EmailController(EmailService emailService) {
-        this.emailUseCase = new EmailUseCase(emailService);
+    public EmailController(JavaMailSender javaMailSender, Environment environment) {
+        this.emailService = new EmailService(javaMailSender, environment);
     }
 
     @PostMapping("/enviarEmail")
     public ResponseEntity<String> enviarEmail(@RequestBody @Valid EmailRequest emailRequest){
         try {
-            Email emailBase = new Email(emailRequest.getEmail(), emailRequest.getAssunto(), emailRequest.getMensagem());
-            EmailResponse emailResponse = emailUseCase.enviarEmail(emailBase) ?  new EmailResponse(emailBase.getEmail(), emailBase.getAssunto(), emailBase.getMensagem()) : null;
+            EmailResponse emailResponse = emailService.enviarEmail(emailService.constroiEmail(emailRequest)) ?  new EmailResponse(emailRequest.getEmail(), emailRequest.getAssunto(), emailRequest.getMensagem()) : null;
             return ResponseEntity.ok().body(emailResponse.toString());
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
