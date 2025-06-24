@@ -27,6 +27,7 @@ public class EmailController {
     public ResponseEntity<String> enviarEmail(@RequestBody @Valid EmailRequest emailRequest){
         try {
             EmailResponse emailResponse = emailService.enviarEmail(emailService.constroiEmail(emailRequest)) ?  new EmailResponse(emailRequest.getEmail(), emailRequest.getAssunto(), emailRequest.getMensagem()) : null;
+            assert emailResponse != null;
             return ResponseEntity.ok().body(emailResponse.toString());
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
