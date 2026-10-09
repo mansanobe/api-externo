@@ -1,10 +1,11 @@
 package com.sistema_de_controle_de_bicicletario.api_externo.service;
 
-import com.sistema_de_controle_de_bicicletario.api_externo.dto.Email.EmailRequest;
-import com.sistema_de_controle_de_bicicletario.api_externo.interfaces.EmailServiceInterface;
+import com.sistema_de_controle_de_bicicletario.api_externo.dto.Email.NovoEmail;
+import com.sistema_de_controle_de_bicicletario.api_externo.service.interfaces.EmailServiceInterface;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,11 +14,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 
+@Setter
 @Service
 public class EmailService implements EmailServiceInterface {
+
     private final JavaMailSender javaMailSender;
     private final Environment ambiente;
-
     @Autowired
     public EmailService(JavaMailSender javaMailSender, Environment ambiente) {
         this.javaMailSender = javaMailSender;
@@ -27,15 +29,13 @@ public class EmailService implements EmailServiceInterface {
 
     @Override
     public Boolean enviarEmail(MimeMessage email) {
-        try{
-            javaMailSender.send(email);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        javaMailSender.send(email);
+
         return true;
     }
 
-    public MimeMessage constroiEmail(EmailRequest emailBase) throws MessagingException, UnsupportedEncodingException {
+    public MimeMessage constroiEmail(NovoEmail emailBase) throws MessagingException, UnsupportedEncodingException {
+
         String remetenteEmail = ambiente.getProperty("spring.mail.properties.mail.smtp.from");
         String nomeEmail = ambiente.getProperty("mail.from.name", "Sistema de Controle de Bicicletário");
         String assuntoEmail = emailBase.getAssunto();
@@ -46,8 +46,7 @@ public class EmailService implements EmailServiceInterface {
         email.setTo(emailBase.getEmail());
         email.setSubject(assuntoEmail);
         email.setFrom(new InternetAddress(remetenteEmail, nomeEmail));
-        email.setText(mensagemEmail, false);
-
+        email.setText(mensagemEmail, mensagemEmail.matches("<[a-z][\\s\\S]*>"));
         return mimeMessage;
     }
 }

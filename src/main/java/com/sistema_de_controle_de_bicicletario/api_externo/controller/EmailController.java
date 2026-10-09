@@ -1,43 +1,39 @@
 package com.sistema_de_controle_de_bicicletario.api_externo.controller;
 
-import com.sistema_de_controle_de_bicicletario.api_externo.dto.Email.EmailRequest;
-import com.sistema_de_controle_de_bicicletario.api_externo.dto.Email.EmailResponse;
-import com.sistema_de_controle_de_bicicletario.api_externo.interfaces.EmailServiceInterface;
-import com.sistema_de_controle_de_bicicletario.api_externo.service.EmailService;
+import com.sistema_de_controle_de_bicicletario.api_externo.dto.Email.NovoEmail;
+import com.sistema_de_controle_de_bicicletario.api_externo.dto.Email.Email;
+import com.sistema_de_controle_de_bicicletario.api_externo.service.interfaces.EmailServiceInterface;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.slf4j.Logger;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.UnsupportedEncodingException;
 
 
 @RestController
 @RequestMapping
-public class EmailController {
+public class  EmailController {
+
+    Logger logger = org.slf4j.LoggerFactory.getLogger(EmailController.class);
+
     private final EmailServiceInterface emailService;
 
-    @Autowired
-    public EmailController(JavaMailSender javaMailSender, Environment environment) {
-        this.emailService = new EmailService(javaMailSender, environment);
+    public EmailController(EmailServiceInterface emailService) {
+        this.emailService = emailService;
     }
 
     @PostMapping("/enviarEmail")
-    public ResponseEntity<String> enviarEmail(@RequestBody @Valid EmailRequest emailRequest){
-        try {
-            EmailResponse emailResponse = emailService.enviarEmail(emailService.constroiEmail(emailRequest)) ?  new EmailResponse(emailRequest.getEmail(), emailRequest.getAssunto(), emailRequest.getMensagem()) : null;
-            assert emailResponse != null;
-            return ResponseEntity.ok().body(emailResponse.toString());
-        }catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<Email> enviarEmail(@RequestBody @Valid NovoEmail novoEmail) throws MessagingException, UnsupportedEncodingException {
+        logger.info("Iniciando o envio de e-mail para: {}", novoEmail.getEmail());
+        if (emailService.enviarEmail(emailService.constroiEmail(novoEmail))){
+            logger.info("E-mail enviado com sucesso para: {}", novoEmail.getEmail());
+            logger.info("Assunto: {}", novoEmail.getAssunto());
+            logger.info("Mensagem: {}", novoEmail.getMensagem());
+            return ResponseEntity.ok().body(new Email(novoEmail.getEmail(), novoEmail.getAssunto(), novoEmail.getMensagem()));
         }
-
+        throw new MessagingException("Erro ao enviar e-mail");
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> excecaoDeValidacao(MethodArgumentNotValidException ex){
-        String mensagem = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        return ResponseEntity.status(422).body(mensagem);
-    }
 }

@@ -20,7 +20,7 @@ services:
   - name: postgres:latest
     alias: postgres_db
     variables:
-      POSTGRES_DB: teste
+      POSTGRES_DB: externo
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
 
@@ -41,10 +41,7 @@ unit-test-job:   # This job runs in the test stage.
   image: maven:3.9.6-eclipse-temurin-17
   script:
     - mvn test
-  variables:
-    SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/teste
-    SPRING_DATASOURCE_USERNAME: postgres
-    SPRING_DATASOURCE_PASSWORD: postgres
+  
 
 
 
@@ -68,7 +65,4 @@ sonarcloud-check:
      - mvn verify sonar:sonar -Dsonar.projectKey=api-externo_api-externo -Dsonar.organization=api-externo -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=484df7216637eb3c6bd45af0626e6c3fceedac55
 
   only:
-    - merge_requests
-    - main
     - master
-    - develop
